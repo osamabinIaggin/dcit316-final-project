@@ -1,0 +1,6 @@
+data/sources/*.pdf
+reports/evidence/*.txt
+__pycache__/
+.DS_Store
+DCIT316_Paper_22128981_GideonElormGlago.md
+PRESENTATION_SCRIPT.md
