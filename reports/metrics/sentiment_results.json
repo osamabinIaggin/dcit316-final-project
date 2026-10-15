@@ -1,0 +1,137 @@
+{
+  "results": {
+    "majority": {
+      "accuracy": 0.47418335089567965,
+      "macro_f1": 0.21443888491779842,
+      "weighted_f1": 0.30505004703796407,
+      "f1_negative": 0.0,
+      "f1_neutral": 0.0,
+      "f1_positive": 0.6433166547533953,
+      "predicted_neutral_rate": 0.0,
+      "silent_failure_rate": 0.0,
+      "macro_f1_ci95": [
+        0.20520301483102357,
+        0.22424242424242424
+      ],
+      "mcnemar_vs_tfidf_logreg": {
+        "only_a_correct": 305,
+        "only_b_correct": 114,
+        "p_value": 3.3130750386120613e-21
+      }
+    },
+    "tfidf_logreg": {
+      "accuracy": 0.6754478398314014,
+      "macro_f1": 0.5925342133951406,
+      "weighted_f1": 0.6692785008509473,
+      "f1_negative": 0.7252747252747253,
+      "f1_neutral": 0.3106060606060606,
+      "f1_positive": 0.7417218543046358,
+      "predicted_neutral_rate": 0.12434141201264488,
+      "silent_failure_rate": 0.0958904109589041,
+      "macro_f1_ci95": [
+        0.5590834757494997,
+        0.6251410929678829
+      ]
+    },
+    "english_only": {
+      "accuracy": 0.2507903055848261,
+      "macro_f1": 0.2432307512767283,
+      "weighted_f1": 0.2339056638537035,
+      "f1_negative": 0.23448275862068965,
+      "f1_neutral": 0.2751322751322751,
+      "f1_positive": 0.22007722007722008,
+      "predicted_neutral_rate": 0.8419388830347735,
+      "silent_failure_rate": 0.8331257783312578,
+      "macro_f1_ci95": [
+        0.21485947396310898,
+        0.2712416899041918
+      ],
+      "mcnemar_vs_tfidf_logreg": {
+        "only_a_correct": 517,
+        "only_b_correct": 114,
+        "p_value": 3.3950321051360965e-62
+      }
+    },
+    "xlmt": {
+      "accuracy": 0.3350895679662803,
+      "macro_f1": 0.3367164969670268,
+      "weighted_f1": 0.3510762070596784,
+      "f1_negative": 0.37623762376237624,
+      "f1_neutral": 0.27927927927927926,
+      "f1_positive": 0.3546325878594249,
+      "predicted_neutral_rate": 0.547945205479452,
+      "silent_failure_rate": 0.5317559153175592,
+      "macro_f1_ci95": [
+        0.3057848808706736,
+        0.36660596370709087
+      ],
+      "mcnemar_vs_tfidf_logreg": {
+        "only_a_correct": 447,
+        "only_b_correct": 124,
+        "p_value": 8.462730728332161e-44
+      }
+    },
+    "nllb_twi": {
+      "accuracy": 0.37302423603793466,
+      "macro_f1": 0.3727697511753239,
+      "weighted_f1": 0.3944071810966081,
+      "f1_negative": 0.4674922600619195,
+      "f1_neutral": 0.275,
+      "f1_positive": 0.3758169934640523,
+      "predicted_neutral_rate": 0.5205479452054794,
+      "silent_failure_rate": 0.5056039850560399,
+      "macro_f1_ci95": [
+        0.3433620839095031,
+        0.4029652980473699
+      ],
+      "mcnemar_vs_tfidf_logreg": {
+        "only_a_correct": 409,
+        "only_b_correct": 122,
+        "p_value": 3.27519125670014e-37
+      }
+    },
+    "nllb_aka": {
+      "accuracy": 0.3667017913593256,
+      "macro_f1": 0.36652186376389473,
+      "weighted_f1": 0.3861966215842411,
+      "f1_negative": 0.46394984326018807,
+      "f1_neutral": 0.2740157480314961,
+      "f1_positive": 0.3616,
+      "predicted_neutral_rate": 0.5152792413066386,
+      "silent_failure_rate": 0.5006226650062267,
+      "macro_f1_ci95": [
+        0.33649449069341,
+        0.3956767702682407
+      ],
+      "mcnemar_vs_tfidf_logreg": {
+        "only_a_correct": 407,
+        "only_b_correct": 114,
+        "p_value": 1.2945331358147035e-39
+      }
+    }
+  },
+  "notes": {
+    "tfidf_logreg": {
+      "C_search_dev_macro_f1": {
+        "0.25": 0.5895234395234396,
+        "0.5": 0.5885418234733303,
+        "1.0": 0.5883367839889578,
+        "2.0": 0.5991112186406441,
+        "4.0": 0.5994972058801846,
+        "8.0": 0.5940189125295507
+      },
+      "chosen_C": 4.0
+    },
+    "nllb_source_code": {
+      "identical_translations": 120,
+      "n": 949,
+      "label_agreement_after_translation": 0.743940990516333
+    },
+    "test_label_distribution": {
+      "negative": 353,
+      "neutral": 146,
+      "positive": 450
+    },
+    "majority_label": "positive"
+  }
+}

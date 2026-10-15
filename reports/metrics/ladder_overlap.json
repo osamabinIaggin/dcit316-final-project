@@ -1,0 +1,19 @@
+{
+  "FLORES-200 twi_Latn": {
+    "tweet_token_coverage": 0.5137,
+    "tweet_type_coverage": 0.1544
+  },
+  "FLORES-200 aka_Latn": {
+    "tweet_token_coverage": 0.5351,
+    "tweet_type_coverage": 0.1621
+  },
+  "MasakhaNER 2.0 twi": {
+    "tweet_token_coverage": 0.5826,
+    "tweet_type_coverage": 0.2191
+  },
+  "flores_aka_vs_twi": {
+    "identical_lines": 8,
+    "lines": 2009,
+    "type_jaccard": 0.358
+  }
+}

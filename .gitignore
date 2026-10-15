@@ -1,6 +1,15 @@
+.venv/
+models/
+data/raw/
 data/sources/*.pdf
 reports/evidence/*.txt
+reports/predictions/all_systems_test.csv
+reports/run_sentiment.log
+build/
 __pycache__/
+.ipynb_checkpoints/
 .DS_Store
 DCIT316_Paper_22128981_GideonElormGlago.md
+DCIT316_Audit_22128981_GideonElormGlago.md
+DCIT316_Audit_22128981_GideonElormGlago.docx
 PRESENTATION_SCRIPT.md
