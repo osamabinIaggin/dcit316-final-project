@@ -115,6 +115,22 @@ pd.DataFrame({'tweet': saved['text'], 'twi_Latn -> eng': a, 'aka_Latn -> eng': b
         ("code", "pd.read_csv(ROOT/'reports/error_analysis/source_code_flips_sample.csv', keep_default_na=False).head(10)"),
         ("code", "json.loads((ROOT/'reports/error_analysis/summary.json').read_text())"),
     ],
+    "05_robustness.ipynb": [
+        ("md", "# 05 · Robustness checks\n\nEach cause proposed in the error analysis is tested by intervention, "
+               "and the baseline is retrained with different feature sets. Model outputs are cached by "
+               "`scripts/run_robustness.py`; rerunning this notebook recomputes the statistics from them."),
+        ("code", SETUP),
+        ("code", "import subprocess\nout = subprocess.run([sys.executable, str(ROOT/'scripts/run_robustness.py')], capture_output=True, text=True, cwd=ROOT)\nprint(out.returncode)"),
+        ("code", "r = json.loads((ROOT/'reports/metrics/robustness.json').read_text())\npd.DataFrame({k: {m: v for m, v in d.items() if not isinstance(v, dict)} for k, d in r['R1_emoji_ablation'].items() if isinstance(d, dict)})"),
+        ("md", "## R2: rewriting `3` as ɛ"),
+        ("code", "pd.DataFrame(r['R2_spelling_fix']['examples'])"),
+        ("code", "pd.DataFrame({k: {m: v for m, v in d.items() if not isinstance(v, dict)} for k, d in r['R2_spelling_fix'].items() if isinstance(d, dict)})"),
+        ("code", "{k: d['mcnemar_before_vs_after'] for k, d in r['R2_spelling_fix'].items() if isinstance(d, dict)}"),
+        ("md", "## R3: twi_Latn vs aka_Latn"),
+        ("code", "r['R3_twi_vs_aka']"),
+        ("md", "## R4: baseline feature ablation"),
+        ("code", "pd.DataFrame(r['R4_feature_ablation']).T"),
+    ],
 }
 
 
