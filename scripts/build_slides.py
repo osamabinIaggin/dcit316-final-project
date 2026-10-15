@@ -72,6 +72,7 @@ def main() -> int:
     ladder = list(csv.DictReader((M / "ladder_profile.csv").open()))
     overlap = json.loads((M / "ladder_overlap.json").read_text())
     errs = json.loads((ROOT / "reports/error_analysis/summary.json").read_text())
+    rob = json.loads((M / "robustness.json").read_text())
     slices = {f'{r["dimension"]}/{r["slice"]}': r for r in csv.DictReader((M / "slices.csv").open())}
     n_test = sum(notes["test_label_distribution"].values())
     gold_neutral = notes["test_label_distribution"]["neutral"] / n_test
@@ -151,7 +152,7 @@ def main() -> int:
         "Metrics: macro-F1 with 95% bootstrap CI, McNemar against the baseline, and the share of "
         "positive or negative tweets called neutral."], 17)
 
-    s = titled(prs, "A small model trained on Twi beats every system that claims Twi", "RQ3 · results")
+    s = titled(prs, "A small model trained on Twi beats every off-the-shelf system tested", "RQ3 · results")
     s.shapes.add_picture(str(F / "fig2_macro_f1.png"), Inches(0.6), Inches(1.6), width=Inches(8.2))
     text(s, 9.0, 1.8, 4.0, 5, [
         f'Baseline {r["tfidf_logreg"]["macro_f1"]:.3f}',
@@ -172,13 +173,14 @@ def main() -> int:
     s.shapes.add_picture(str(F / "fig5_slices.png"), Inches(0.4), Inches(1.5), width=Inches(7.6))
     nl = notes["nllb_source_code"]
     text(s, 8.2, 1.7, 4.8, 5.2, [
-        f'NLLB leaves "3"-spellings untranslated in {errs["copy_through"]["translations_still_containing_3_spellings"]} '
-        f'of {errs["copy_through"]["tweets_with_3_for_e"]} tweets that use them.',
         f'Changing only the declared source (twi_Latn vs aka_Latn) changes the translation of '
         f'{nl["n"] - nl["identical_translations"]} of {nl["n"]} tweets and the final label of '
         f'{errs["nllb_twi_vs_aka_label_disagreements"]}.',
-        "Without emoji, the English model calls "
-        f'{float(slices["emoji/no emoji"]["english_only_pred_neutral"]):.0%} of tweets neutral, so its other calls come mostly from emoji.',
+        f'Tested by removing emoji: {rob["R1_emoji_ablation"]["english_only"]["of_which_become_neutral"]} of the English '
+        f'model\'s {rob["R1_emoji_ablation"]["english_only"]["nonneutral_predictions_with_emoji"]} non-neutral calls on emoji tweets turn neutral.',
+        f'Rewriting 3 as ɛ stops NLLB copying it but does not significantly help the pipeline '
+        f'(p = {rob["R2_spelling_fix"]["nllb_twi"]["mcnemar_before_vs_after"]["p_value"]:.2f}); it does help XLM-T '
+        f'(p = {rob["R2_spelling_fix"]["xlmt"]["mcnemar_before_vs_after"]["p_value"]:.3f}).',
         f'{errs["all_three_nonmajority_systems_wrong"]} tweets defeat the baseline, XLM-T and NLLB alike.'], 14)
 
     s = titled(prs, "Limitations", "Responsible claims")
@@ -193,7 +195,7 @@ def main() -> int:
     text(s, 0.6, 1.7, 12, 4.4, [
         "Twi capability claims rest on text translated into Twi. The only natively written labelled "
         "corpus is 4,818 tweets, and off-the-shelf tools fail on it in a way that looks like neutrality.",
-        "A model trained on that corpus beats every system that claims broader coverage.",
+        "On that corpus, a small model trained on Twi scored far above every off-the-shelf system tested.",
         "Needed: a Ga corpus, a larger natively written Twi corpus, a convention for naming the variety, "
         "and agreement scores reported in comparable form."], 19)
     text(s, 0.6, 6.2, 12, 0.6, [f"Code, data manifests and notebooks: {REPO}"], 14, ACCENT)
