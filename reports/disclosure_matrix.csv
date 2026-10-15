@@ -1,0 +1,7 @@
+Criterion,FLORES-200,AfriSenti,AfriHate,MasakhaNER 2.0
+A1 Language referent precise,no dialect named,no dialect named,no dialect named,merges 'Akan/Twi'
+A2 Natively written,translated (Wikipedia),YES - tweets,YES - tweets,translated (MAFAND-MT)
+A3 Native-speaker annotators stated,human-verified translation,yes,"yes, explicit",yes
+A4 Agreement reported,n/a,"yes, k=0.51","yes, 0.46-0.81","yes, k=0.932 POST-ADJUDICATION"
+A5 Compensation disclosed,not found,not found,yes - 'more than the minimum wage',yes - all annotators remunerated
+A6 Datasheet / data statement,not found,not found,not found,not found

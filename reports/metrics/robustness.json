@@ -1,0 +1,131 @@
+{
+  "R1_emoji_ablation": {
+    "n_with_emoji": 411,
+    "english_only": {
+      "macro_f1_with_emoji": 0.3619,
+      "macro_f1_emoji_removed": 0.1612,
+      "pred_neutral_with_emoji": 0.6959,
+      "pred_neutral_emoji_removed": 0.9246,
+      "nonneutral_predictions_with_emoji": 125,
+      "of_which_become_neutral": 98,
+      "unchanged_on_emoji_free_tweets": 538,
+      "n_emoji_free": 538,
+      "mcnemar_before_vs_after": {
+        "only_a_correct": 77,
+        "only_b_correct": 11,
+        "p_value": 2.401553173434181e-13
+      }
+    },
+    "xlmt": {
+      "macro_f1_with_emoji": 0.4337,
+      "macro_f1_emoji_removed": 0.2721,
+      "pred_neutral_with_emoji": 0.4866,
+      "pred_neutral_emoji_removed": 0.6326,
+      "nonneutral_predictions_with_emoji": 211,
+      "of_which_become_neutral": 96,
+      "unchanged_on_emoji_free_tweets": 538,
+      "n_emoji_free": 538,
+      "mcnemar_before_vs_after": {
+        "only_a_correct": 98,
+        "only_b_correct": 26,
+        "p_value": 5.023293083821098e-11
+      }
+    }
+  },
+  "R2_spelling_fix": {
+    "n_tweets_with_3_for_e": 387,
+    "examples": [
+      {
+        "original": "ah ka s3 prison mpo er",
+        "normalised": "ah ka sɛ prison mpo er"
+      },
+      {
+        "original": "slim things de3 3noaa ne wei ooo🤩🤩🤩😘😂",
+        "normalised": "slim things deɛ ɛnoaa ne wei ooo🤩🤩🤩😘😂"
+      },
+      {
+        "original": "ceremonial vp nso y3di bor bra",
+        "normalised": "ceremonial vp nso yɛdi bor bra"
+      },
+      {
+        "original": "eeeeiii 3ne3 mo mmoa nnipa na prostate de3 3ya",
+        "normalised": "eeeeiii ɛneɛ mo mmoa nnipa na prostate deɛ ɛya"
+      },
+      {
+        "original": "sei a na mep3 cmo",
+        "normalised": "sei a na mepɛ cmo"
+      }
+    ],
+    "nllb_twi": {
+      "macro_f1_before": 0.3417,
+      "macro_f1_after": 0.3491,
+      "pred_neutral_before": 0.5323,
+      "pred_neutral_after": 0.4729,
+      "translations_with_3_spellings_before": 188,
+      "translations_with_3_spellings_after": 2,
+      "mcnemar_before_vs_after": {
+        "only_a_correct": 46,
+        "only_b_correct": 50,
+        "p_value": 0.7596492883236297
+      }
+    },
+    "xlmt": {
+      "macro_f1_before": 0.3224,
+      "macro_f1_after": 0.3618,
+      "pred_neutral_before": 0.6537,
+      "pred_neutral_after": 0.5401,
+      "mcnemar_before_vs_after": {
+        "only_a_correct": 18,
+        "only_b_correct": 35,
+        "p_value": 0.027008317653722358
+      }
+    }
+  },
+  "R3_twi_vs_aka": {
+    "macro_f1_twi": 0.3728,
+    "macro_f1_aka": 0.3665,
+    "mcnemar": {
+      "only_a_correct": 84,
+      "only_b_correct": 78,
+      "p_value": 0.6945673674329714
+    }
+  },
+  "R4_feature_ablation": {
+    "char_only": {
+      "chosen_C": 8.0,
+      "dev_macro_f1": 0.6146,
+      "test_macro_f1": 0.5777,
+      "test_macro_f1_ci95": [
+        0.548,
+        0.6086
+      ]
+    },
+    "word_only": {
+      "chosen_C": 4.0,
+      "dev_macro_f1": 0.5662,
+      "test_macro_f1": 0.5689,
+      "test_macro_f1_ci95": [
+        0.5373,
+        0.6018
+      ]
+    },
+    "char_plus_word (reported baseline)": {
+      "chosen_C": 4.0,
+      "dev_macro_f1": 0.5995,
+      "test_macro_f1": 0.5925,
+      "test_macro_f1_ci95": [
+        0.5591,
+        0.6251
+      ]
+    },
+    "char_plus_word_keeping_emoji": {
+      "chosen_C": 4.0,
+      "dev_macro_f1": 0.5993,
+      "test_macro_f1": 0.5848,
+      "test_macro_f1_ci95": [
+        0.553,
+        0.6166
+      ]
+    }
+  }
+}

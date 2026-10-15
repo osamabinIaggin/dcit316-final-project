@@ -1,0 +1,5 @@
+corpus,n_texts,n_tokens,open_vowel_token_share,digit_substitution,non_twi_letter_token_share,english_token_share,has_emoji,has_handle_or_url,word_final_open_vowel_share
+FLORES-200 twi_Latn,2009,25.3051,0.2846,0.0005,0.0351,0.0,0.0,0.0,0.1556
+FLORES-200 aka_Latn,2009,25.8064,0.2612,0.001,0.0314,0.0,0.0,0.0,0.1655
+MasakhaNER 2.0 twi,6056,23.4171,0.3462,0.0003,0.0166,0.0048,0.0,0.0,0.2019
+AfriSenti twi,4818,9.3269,0.0559,0.4255,0.0464,0.0508,0.4116,0.0,0.0384

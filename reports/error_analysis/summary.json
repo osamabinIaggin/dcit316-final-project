@@ -1,0 +1,13 @@
+{
+  "copy_through": {
+    "tweets_with_3_for_e": 387,
+    "translations_still_containing_3_spellings": 188,
+    "nllb_twi_pred_neutral_when_copied": 0.6011,
+    "nllb_twi_pred_neutral_when_not_copied": 0.4673,
+    "nllb_twi_pred_neutral_tweets_without_3": 0.5125
+  },
+  "gold_nonneutral_predicted_neutral_by_nllb_twi": 406,
+  "all_three_nonmajority_systems_wrong": 132,
+  "nllb_twi_vs_aka_label_disagreements": 243,
+  "n_test": 949
+}
