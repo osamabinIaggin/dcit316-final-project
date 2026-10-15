@@ -30,6 +30,7 @@ python3 -m venv .venv
 .venv/bin/python scripts/run_ladder.py            # RQ2: corpus surface statistics, Figure 1
 .venv/bin/python scripts/run_sentiment.py         # RQ3: five systems on AfriSenti Twi test
 .venv/bin/python scripts/run_error_analysis.py    # slices, error samples, Figures 2-5
+.venv/bin/python scripts/run_robustness.py        # tests the proposed causes, baseline ablation
 .venv/bin/python scripts/build_notebooks.py       # executes notebooks/ with outputs saved
 .venv/bin/python -m pytest -q tests               # unit tests
 .venv/bin/python scripts/fill_manuscript.py       # writes numbers into the manuscript
@@ -62,6 +63,7 @@ needed to check the results. See `data_card.md`.
 | Neutral collapse (Figure 3) | `reports/metrics/sentiment_results.json` |
 | Slice results (Table 5, Figure 5) | `reports/metrics/slices.csv` |
 | Error counts and examples | `reports/error_analysis/` |
+| Emoji ablation, spelling fix, twi vs aka test, feature ablation (Tables 6-7) | `reports/metrics/robustness.json`, `notebooks/05_robustness.ipynb` |
 | Per-tweet predictions of every system | `reports/predictions/all_systems_test_ids.csv` (by test row) |
 | NLLB translations (twi_Latn and aka_Latn) | `data/derived/translations_*.csv` |
 
@@ -73,7 +75,7 @@ Numbers in the manuscript are inserted by `scripts/fill_manuscript.py` from thes
 |---|---|
 | `src/` | Corpus loaders, surface features, metrics |
 | `scripts/` | Every step above, runnable in order |
-| `notebooks/` | Four executed notebooks, one per stage |
+| `notebooks/` | Five executed notebooks, one per stage |
 | `tests/` | Unit tests for features and metrics |
 | `reports/` | Metrics, figures, predictions, evidence, error analysis, verified BibTeX |
 | `manuscript/` | Manuscript template with placeholders |

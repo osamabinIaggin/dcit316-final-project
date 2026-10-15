@@ -15,3 +15,6 @@
 | Unit tests | Yes | `tests/`, run with `pytest` |
 | Every paper number traceable to a file | Yes, see the claims table in `README.md` | `README.md` |
 | Known nondeterminism | NLLB greedy decoding on Apple MPS can differ in rare tokens from CPU output; the saved translations are what the results use | `failure_log.md` |
+| Proposed causes tested by intervention | Yes, emoji ablation and spelling fix | `scripts/run_robustness.py`, `reports/metrics/robustness.json` |
+| Sensitivity to feature choice | Yes, four baseline variants | `reports/metrics/robustness.json` (R4) |
+| Final commit identified | Tag `v1.0-submission` | GitHub |
