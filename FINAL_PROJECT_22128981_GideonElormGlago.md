@@ -41,23 +41,24 @@ discourse could fairly conclude that the tools exist.
 I wanted to know what that support amounts to for the text people in Ghana actually post. Twi on
 social media is short, informal and often mixed with English, and it is often typed without the
 letters ɛ and ɔ. AfriSenti's authors put this down to keyboards that lack those letters, and note that
-ɛ is typed as `3` and ɔ as `c`. Benchmarks rarely look like this.
+ɛ is typed as `3` and ɔ as `c`. The benchmarks used to evaluate Twi systems are written differently,
+as Section 5.3 shows.
 
 A claim that a system "supports Twi" bundles two different things. One is capability: does the
 system work on the text you have? The other is accountability: can someone outside the project find
-out which Twi was covered, where the text came from, who labelled it and how reliably? The second can
-be checked from documents; the first needs experiments. This project does both.
+out which Twi was covered, where the text came from, who labelled it and how reliably? Accountability can be checked from documents, while capability needs experiments, so this project
+uses both.
 
-**Research questions.**
+The project asks three questions.
 
-- **RQ1 (accountability).** What do the public resources that claim Twi coverage disclose about the
+- RQ1 (accountability): What do the public resources that claim Twi coverage disclose about the
   language variety, the provenance of the text, the annotators and their agreement?
-- **RQ2 (distribution).** How far is the text these claims are measured on from Twi as it is written
+- RQ2 (distribution): How far is the text these claims are measured on from Twi as it is written
   on social media?
-- **RQ3 (capability).** How do the tools a Ghanaian analyst would reach for perform on natively
+- RQ3 (capability): How do the tools a Ghanaian analyst would reach for perform on natively
   written Twi tweets, compared with a simple baseline trained on Twi?
 
-**Contributions.** A documentation audit of four resources against six criteria, two of which
+The project contributes a documentation audit of four resources against six criteria, two of which
 (provenance of the text, and comparability of agreement scores) are added here; a measurement of the
 distance between the three Twi corpora that exist; and an evaluation of five sentiment systems on
 AfriSenti Twi, with an error analysis by orthography, English mixing, length and emoji. All code,
@@ -65,7 +66,7 @@ saved predictions, metrics and executed notebooks are in the repository above.
 
 ## 2. Related work
 
-**African-language social media data.** AfriSenti (Muhammad et al., 2023a) and its shared task
+ AfriSenti (Muhammad et al., 2023a) and its shared task
 (Muhammad et al., 2023b) released sentiment-labelled tweets for 14 African languages; the Twi subset
 is the only human-labelled sentiment data for a Ghanaian language I could find. AfriHate (Muhammad et
 al., 2025) adds hate and abusive-language labels for 15 languages including Twi. MasakhaNER 2.0
@@ -73,29 +74,29 @@ al., 2025) adds hate and abusive-language labels for 15 languages including Twi.
 text for several of them from MAFAND-MT (Adelani et al., 2022b), a corpus of French and English news
 translated into African languages.
 
-**Translation benchmarks and their quality.** FLORES-200 was built for NLLB-200 (NLLB Team et al.,
+ FLORES-200 was built for NLLB-200 (NLLB Team et al.,
 2022) by translating 2,009 English Wikimedia sentences into roughly 200 languages. Abdulmumin et al.
 (2024) had native speakers review the FLORES files for Hausa, Northern Sotho, Xitsonga and isiZulu
 and found enough errors to release corrections. No Ghanaian language was covered.
 
-**Language identification.** Caswell et al. (2020) showed that identifiers which score well on
+ Caswell et al. (2020) showed that identifiers which score well on
 held-out sets can produce web corpora in which most text labelled as a low-resource language is
 something else. Burchell et al. (2024) found that identifying languages in code-switched text
 remains unsolved. Both matter here because AfriSenti assigned most of its Twi tweets to Twi with a
 model trained on 2,000 hand-labelled examples.
 
-**Sentiment models for tweets.** The English model evaluated here comes from the TimeLMs series
+ The English model evaluated here comes from the TimeLMs series
 (Loureiro et al., 2022), fine-tuned on the TweetEval sentiment task (Barbieri et al., 2020). XLM-T
 (Barbieri et al., 2022) continues training XLM-R on multilingual tweets and fine-tunes it for
 sentiment in eight languages, none of them African.
 
-**Documentation standards.** Data statements (Bender and Friedman, 2018), datasheets (Gebru et al.,
+ Data statements (Bender and Friedman, 2018), datasheets (Gebru et al.,
 2021) and model cards (Mitchell et al., 2019) set out what dataset and model creators should record.
 The audit criteria in Section 4.1 build on them.
 
-The gap this project addresses: the African NLP literature reports what systems achieve on its
-benchmarks, and the documentation literature says what should be disclosed, but I found no work that
-checks Ghanaian-language claims against both the documentation and the text Ghanaians write.
+The African NLP literature reports what systems achieve on its benchmarks, and the documentation
+literature says what should be disclosed. I found no work that checks Ghanaian-language claims
+against both the documentation and the text Ghanaians write.
 
 ## 3. Data and ethics
 
@@ -162,7 +163,7 @@ All systems are scored on the 949-tweet AfriSenti Twi test split, which is used 
 | System | What it is | Role |
 |---|---|---|
 | Majority class | Most frequent training label (positive) | Floor |
-| **TF-IDF + logistic regression** | Character 2–5-grams and word 1–2-grams, class-balanced, C chosen on dev | **Baseline**: trained on Twi |
+| TF-IDF + logistic regression | Character 2- to 5-grams plus word unigrams and bigrams, class-balanced, C chosen on dev | Baseline, trained on Twi |
 | English-only | `cardiffnlp/twitter-roberta-base-sentiment-latest`, applied directly to Twi | What an analyst uses by default |
 | XLM-T | `cardiffnlp/twitter-xlm-roberta-base-sentiment`, zero-shot | Multilingual, no Twi training |
 | NLLB → English | `nllb-200-distilled-600M` translates Twi to English, then the English-only model | Translate-then-classify |
@@ -171,14 +172,14 @@ The NLLB pipeline is run twice on identical input, once declaring the source as 
 as `aka_Latn`, because FLORES treats these as separate languages and no resource says which one
 tweets belong to. Decoding is greedy with at most 96 new tokens.
 
-**Metrics.** Macro-F1 is the primary metric because the classes are unbalanced; accuracy, weighted
+Macro-F1 is the primary metric because the classes are unbalanced; accuracy, weighted
 F1 and per-class F1 are also reported. A 95% bootstrap interval (1,000 resamples, seed 22128981)
 accompanies each macro-F1, and an exact McNemar test compares each system with the baseline. I also
-report the **silent-failure rate**: of the tweets whose gold label is positive or negative, the share
+report a silent-failure rate: of the tweets whose gold label is positive or negative, the share
 predicted neutral. This error produces no warning, because a confident "neutral" looks like an
 ordinary answer.
 
-**Error analysis.** The test split is cut by orthography (uses ɛ/ɔ, writes `3` for ɛ, neither), by
+For the error analysis, the test split is cut by orthography (uses ɛ/ɔ, writes `3` for ɛ, neither), by
 English-token share, by length and by the presence of emoji, and macro-F1 is computed per slice.
 Samples of three error types are saved for inspection: sentiment lost through translation, tweets
 every non-trivial system gets wrong, and label changes caused only by the declared source language.
@@ -208,20 +209,24 @@ be repeated for it.
 | A1 Language referent | Two files, `aka_Latn` and `twi_Latn`; no dialect | "Twi", no dialect | "Twi", no dialect | "Akan/Twi", no dialect |
 | A2 Natively written | No, translated from English | Yes, tweets | Yes, tweets | No, MAFAND-MT translation |
 | A3 Native-speaker annotators | Human-verified translation | Yes | Yes | Yes |
-| A4 Agreement | n/a | κ = 0.51 | 0.46–0.81 across languages | κ = 0.932, after adjudication |
+| A4 Agreement | n/a | κ = 0.51 | 0.46 to 0.81 across languages | κ = 0.932, after adjudication |
 | A5 Annotator pay disclosed | Not found | Not found | "more than the minimum wage" | "appropriate remuneration" |
 | A6 Datasheet or data statement | Not found | Not found | Not found | Not found |
 
 *Table 2. Disclosure matrix. Evidence lines for every cell are in `reports/evidence/`.*
 
-**Nobody says which Twi.** FLORES-200 has two files, `aka_Latn` and `twi_Latn`. They are not copies:
+#### Language variety
+
+FLORES-200 has two files, `aka_Latn` and `twi_Latn`. They are not copies:
 only 8 of 2,009 lines are
 identical, and the Jaccard similarity of their vocabularies is
 0.36. MasakhaNER 2.0 merges the two names into "Akan/Twi";
 AfriSenti and AfriHate say "Twi". None of the four papers mentions Akuapem, Asante or Fante, the
 varieties a Ghanaian reader would ask about.
 
-**The benchmarks are translations.** FLORES-200 is English Wikimedia text translated into Twi. For
+#### Where the text comes from
+
+FLORES-200 is English Wikimedia text translated into Twi. For
 Twi, MasakhaNER 2.0 uses MAFAND-MT, which its paper describes as "French and English news articles
 translated into 11 languages". The authors add: "We note that translationese may lead to undesired
 properties, e.g., unnaturalness. However, we did not observe serious issues during the annotation."
@@ -229,19 +234,25 @@ That second sentence is about whether annotators could label the text reliably. 
 about whether the text resembles Twi as people write it, which is the property at issue here. The
 only natively written Twi among the four resources is in the two Twitter collections.
 
-**The natively written corpus flags its own difficulty.** AfriSenti's authors write that "a
+#### Annotation of the tweets
+
+AfriSenti's authors write that "a
 significant portion of tweets in Twi were ambiguous, making it difficult to categorize sentiment
 accurately", and report κ = 0.51 for Twi. They also explain that native speakers labelled 2,000
 tweets as Twi or not, and a model trained on those labels assigned the rest, which is the setting
 Caswell et al. (2020) warn about.
 
-**Agreement scores cannot be compared.** MasakhaNER 2.0's κ = 0.932 for Twi is measured after
+#### Agreement scores
+
+MasakhaNER 2.0's κ = 0.932 for Twi is measured after
 language coordinators resolved disagreements; the paper says the pre-intervention score "was much
 lower" and gives one example (Nigerian Pidgin, 0.648 before and 0.966 after). AfriSenti's 0.51 is a
 free-marginal kappa with no adjudication step described. A reader choosing between the corpora on
 reported agreement would be comparing two different quantities.
 
-**No datasheets.** The A6 search found no datasheet, data statement or data card in any of the four
+#### Datasheets and pay
+
+The A6 search found no datasheet, data statement or data card in any of the four
 papers. AfriHate and MasakhaNER 2.0 disclose that annotators were paid; AfriSenti does not say.
 
 ### 5.3 Distance from social media text (RQ2)
@@ -257,7 +268,7 @@ papers. AfriHate and MasakhaNER 2.0 disclose that annotators were paid; AfriSent
 
 ![Figure 1. Surface profile of the three Twi corpora. The two benchmarks write ɛ and ɔ; the tweets mostly write 3 or nothing.](reports/figures/fig1_domain_ladder.png)
 
-The tweets are a different kind of text. They are less than half as long as benchmark sentences.
+Tweets average fewer than half as many tokens as benchmark sentences.
 In the benchmarks, between 26.1% and
 34.6% of tokens contain ɛ or ɔ; in the tweets,
 5.6% do, and 42.5%
@@ -274,7 +285,7 @@ construction). Vocabulary overlap is low: FLORES `twi_Latn` covers
 | System | Accuracy | Macro-F1 [95% CI] | F1 neg / neu / pos | Predicted neutral | Silent failure | McNemar p vs baseline |
 |---|---|---|---|---|---|---|
 | Majority class | 0.474 | 0.214 [0.205, 0.224] | 0.00 / 0.00 / 0.64 | 0.0% | 0.0% | < 0.001 |
-| **TF-IDF + LogReg (baseline)** | **0.675** | **0.593** [0.559, 0.625] | 0.73 / 0.31 / 0.74 | 12.4% | 9.6% | — |
+| TF-IDF + LogReg (baseline) | 0.675 | 0.593 [0.559, 0.625] | 0.73 / 0.31 / 0.74 | 12.4% | 9.6% | n/a |
 | English-only | 0.251 | 0.243 [0.215, 0.271] | 0.23 / 0.28 / 0.22 | 84.2% | 83.3% | < 0.001 |
 | XLM-T | 0.335 | 0.337 [0.306, 0.367] | 0.38 / 0.28 / 0.35 | 54.8% | 53.2% | < 0.001 |
 | NLLB `twi_Latn` → English | 0.373 | 0.373 [0.343, 0.403] | 0.47 / 0.28 / 0.38 | 52.1% | 50.6% | < 0.001 |
@@ -295,7 +306,7 @@ p < 0.001), and none of the confidence intervals overlaps the baseline's.
 
 ![Figure 3. Predicted-neutral and silent-failure rates against the gold neutral rate (dashed).](reports/figures/fig3_neutral_collapse.png)
 
-The failure has a direction. Only 15.4% of test tweets are neutral, yet
+The off-the-shelf systems fail towards neutral. Only 15.4% of test tweets are neutral, yet
 the English-only model predicts neutral for 84.2% of
 them and turns 83.3% of the positive and negative tweets
 into neutral. XLM-T and the NLLB pipeline do the same to about half
@@ -321,15 +332,20 @@ output would show it.
 
 ![Figure 5. Macro-F1 by slice for the four main systems.](reports/figures/fig5_slices.png)
 
-**The English model is reading the emoji.** On tweets without emoji it predicts neutral for
+#### Emoji
+
+On tweets without emoji it predicts neutral for
 95.3% of them and scores
 0.129; with emoji it scores
-0.362. Its errors fall slightly as the English share
+0.362, so most of its non-neutral predictions appear to
+come from the emoji. Its errors fall slightly as the English share
 rises (0.389 above 25%, from
 0.224 with none), but that slice holds only
 26 tweets.
 
-**Translation passes informal spelling through untouched.** Of the
+#### Spelling and translation
+
+Of the
 387 test tweets that write `3` for ɛ,
 188 (48.6%)
 come back from NLLB with those words still in them: `s3`, `de3`, `y3di` reach the English classifier
@@ -339,33 +355,38 @@ as unknown strings. Those tweets are then called neutral
 Standard orthography does not rescue translation either: on tweets that use ɛ/ɔ the NLLB pipeline
 scores 0.366.
 
-**Which "Twi" you declare changes the answer.** Translating the same tweets as `twi_Latn` and as
+#### Declared source language
+
+Translating the same tweets as `twi_Latn` and as
 `aka_Latn` gives identical output for only 120 of
 949. The final sentiment label differs for
 243 tweets (25.6%),
-though the two settings score almost the same overall. The naming confusion in Section 5.2 is
-therefore an input to the result: an analyst who picks the other code gets a different label for
-one tweet in four, and nothing in the documentation tells them which code is right.
+though the two settings score almost the same overall. An analyst who picks the other code gets a different label for one tweet in four, and nothing in
+the documentation reviewed in Section 5.2 says which code is right.
 
-**The baseline is steady.** Its macro-F1 stays between 0.55 and 0.65 on every slice, including the
+#### The baseline
+
+Its macro-F1 stays between 0.55 and 0.65 on every slice, including the
 spelling variants that defeat translation. Its weak point is the neutral class (F1
 0.31), the smallest and, given κ = 0.51, probably the noisiest.
 
-**Hard cases.** 132 tweets are misclassified by the
+#### Tweets every system gets wrong
+
+132 tweets are misclassified by the
 baseline, XLM-T and the NLLB pipeline alike. Samples are saved in `reports/error_analysis/`. I cannot
 read them well enough to say whether the systems or the gold labels are wrong, and with the
 creators' own note that many Twi tweets are ambiguous, some of these are likely label errors.
 
 ## 7. Discussion
 
-The three questions have connected answers. The resources that claim Twi measure their claims on
+The resources that claim Twi measure their claims on
 translated, standard-orthography prose (RQ1, RQ2), while Twi online is short, mixed with English and
 emoji, and spelled with digits in place of letters (RQ2). On that text, every system built for
 broad coverage loses to a small model trained on 3,481 tweets, and loses by turning sentiment into
 neutral (RQ3).
 
-For anyone mining Ghanaian social media, the practical conclusion is uncomfortable but cheap to act
-on. Off-the-shelf multilingual and translation-based pipelines are the wrong default for Twi. Even
+For anyone mining Ghanaian social media, off-the-shelf multilingual and translation-based pipelines
+are the wrong default for Twi. Even
 a modest amount of in-domain labelled data, with a linear model, does better. The pressing work is
 collecting and labelling more natively written text, for Twi and especially for Ga and Ewe, where
 none exists.
@@ -381,20 +402,20 @@ them, Google Translate, could not be tested here at all.
 
 ## 8. Limitations
 
-- **Absent is not the same as not done.** "Not found" in Table 2 means the fact is missing from the
+-  "Not found" in Table 2 means the fact is missing from the
   public paper. The practice may have happened.
-- **Label quality.** Every capability result depends on AfriSenti's labels (κ = 0.51 for Twi, with
+-  Every capability result depends on AfriSenti's labels (κ = 0.51 for Twi, with
   ambiguity noted by the authors). Some of what looks like system error is probably label noise.
-- **No native-speaker judgement.** I do not read Twi well enough to evaluate translations, so the
+-  I do not read Twi well enough to evaluate translations, so the
   NLLB results show that sentiment was lost, not that a translation was wrong.
-- **One dataset, one task.** Sentiment on one Twitter corpus. Hate speech (AfriHate Twi) and other
+-  Sentiment on one Twitter corpus. Hate speech (AfriHate Twi) and other
   tasks could behave differently.
-- **Models chosen.** XLM-T was not trained on any African language; an Africa-centric model
+-  XLM-T was not trained on any African language; an Africa-centric model
   fine-tuned for sentiment might do much better. Google Translate was not tested because I had no
   API key. Language identifiers (AfroLID, GlotLID) were not run.
-- **Surface features are proxies.** The English-token estimate and the orthography slices are
+-  The English-token estimate and the orthography slices are
   heuristics, tested in `tests/`, but not validated against human judgement.
-- **Coverage.** Ga's absence was checked against FLORES-200's file list; Dagbani was not checked
+-  Ga's absence was checked against FLORES-200's file list; Dagbani was not checked
   everywhere. GhanaNLP corpora and the Khaya translator were not audited.
 
 ## 9. Conclusion
@@ -421,30 +442,30 @@ publisher's record, and every number is written into this manuscript by
 
 Abdulmumin, I., Mkhwanazi, S., Mbooi, M. S., Muhammad, S. H., Ahmad, I. S., Putini, N., Mathebula, M., Shingange, M., Gwadabe, T., and Marivate, V. (2024). Correcting FLORES evaluation dataset for four African languages. arXiv:2409.00626.
 
-Adelani, D. I., Neubig, G., Ruder, S., Rijhwani, S., et al. (2022a). MasakhaNER 2.0: Africa-centric transfer learning for named entity recognition. In *Proceedings of EMNLP 2022*, 4488–4508.
+Adelani, D. I., Neubig, G., Ruder, S., Rijhwani, S., et al. (2022a). MasakhaNER 2.0: Africa-centric transfer learning for named entity recognition. In *Proceedings of EMNLP 2022*, 4488-4508.
 
-Adelani, D. I., Alabi, J. O., Fan, A., Kreutzer, J., et al. (2022b). A few thousand translations go a long way! Leveraging pre-trained models for African news translation. In *Proceedings of NAACL 2022*, 3053–3070.
+Adelani, D. I., Alabi, J. O., Fan, A., Kreutzer, J., et al. (2022b). A few thousand translations go a long way! Leveraging pre-trained models for African news translation. In *Proceedings of NAACL 2022*, 3053-3070.
 
-Barbieri, F., Camacho-Collados, J., Espinosa Anke, L., and Neves, L. (2020). TweetEval: Unified benchmark and comparative evaluation for tweet classification. In *Findings of EMNLP 2020*, 1644–1650.
+Barbieri, F., Camacho-Collados, J., Espinosa Anke, L., and Neves, L. (2020). TweetEval: Unified benchmark and comparative evaluation for tweet classification. In *Findings of EMNLP 2020*, 1644-1650.
 
-Barbieri, F., Espinosa Anke, L., and Camacho-Collados, J. (2022). XLM-T: Multilingual language models in Twitter for sentiment analysis and beyond. In *Proceedings of LREC 2022*, 258–266.
+Barbieri, F., Espinosa Anke, L., and Camacho-Collados, J. (2022). XLM-T: Multilingual language models in Twitter for sentiment analysis and beyond. In *Proceedings of LREC 2022*, 258-266.
 
-Bender, E. M., and Friedman, B. (2018). Data statements for natural language processing: Toward mitigating system bias and enabling better science. *Transactions of the ACL*, 6, 587–604.
+Bender, E. M., and Friedman, B. (2018). Data statements for natural language processing: Toward mitigating system bias and enabling better science. *Transactions of the ACL*, 6, 587-604.
 
-Burchell, L., Birch, A., Thompson, R., and Heafield, K. (2024). Code-switched language identification is harder than you think. In *Proceedings of EACL 2024*, 646–658.
+Burchell, L., Birch, A., Thompson, R., and Heafield, K. (2024). Code-switched language identification is harder than you think. In *Proceedings of EACL 2024*, 646-658.
 
-Caswell, I., Breiner, T., van Esch, D., and Bapna, A. (2020). Language ID in the wild: Unexpected challenges on the path to a thousand-language web text corpus. In *Proceedings of COLING 2020*, 6588–6608.
+Caswell, I., Breiner, T., van Esch, D., and Bapna, A. (2020). Language ID in the wild: Unexpected challenges on the path to a thousand-language web text corpus. In *Proceedings of COLING 2020*, 6588-6608.
 
-Gebru, T., Morgenstern, J., Vecchione, B., Vaughan, J. W., Wallach, H., Daumé III, H., and Crawford, K. (2021). Datasheets for datasets. *Communications of the ACM*, 64(12), 86–92.
+Gebru, T., Morgenstern, J., Vecchione, B., Vaughan, J. W., Wallach, H., Daumé III, H., and Crawford, K. (2021). Datasheets for datasets. *Communications of the ACM*, 64(12), 86-92.
 
-Loureiro, D., Barbieri, F., Neves, L., Espinosa Anke, L., and Camacho-Collados, J. (2022). TimeLMs: Diachronic language models from Twitter. In *Proceedings of ACL 2022: System Demonstrations*, 251–260.
+Loureiro, D., Barbieri, F., Neves, L., Espinosa Anke, L., and Camacho-Collados, J. (2022). TimeLMs: Diachronic language models from Twitter. In *Proceedings of ACL 2022: System Demonstrations*, 251-260.
 
-Mitchell, M., Wu, S., Zaldivar, A., Barnes, P., Vasserman, L., Hutchinson, B., Spitzer, E., Raji, I. D., and Gebru, T. (2019). Model cards for model reporting. In *Proceedings of FAT* 2019*, 220–229.
+Mitchell, M., Wu, S., Zaldivar, A., Barnes, P., Vasserman, L., Hutchinson, B., Spitzer, E., Raji, I. D., and Gebru, T. (2019). Model cards for model reporting. In *Proceedings of FAT* 2019*, 220-229.
 
-Muhammad, S. H., Abdulmumin, I., Ayele, A. A., Ousidhoum, N., Adelani, D. I., Yimam, S. M., et al. (2023a). AfriSenti: A Twitter sentiment analysis benchmark for African languages. In *Proceedings of EMNLP 2023*, 13968–13981.
+Muhammad, S. H., Abdulmumin, I., Ayele, A. A., Ousidhoum, N., Adelani, D. I., Yimam, S. M., et al. (2023a). AfriSenti: A Twitter sentiment analysis benchmark for African languages. In *Proceedings of EMNLP 2023*, 13968-13981.
 
-Muhammad, S. H., Abdulmumin, I., Yimam, S. M., Adelani, D. I., Ahmad, I. S., Ousidhoum, N., Ayele, A. A., Mohammad, S. M., Beloucif, M., and Ruder, S. (2023b). SemEval-2023 Task 12: Sentiment analysis for African languages (AfriSenti-SemEval). In *Proceedings of SemEval-2023*, 2319–2337.
+Muhammad, S. H., Abdulmumin, I., Yimam, S. M., Adelani, D. I., Ahmad, I. S., Ousidhoum, N., Ayele, A. A., Mohammad, S. M., Beloucif, M., and Ruder, S. (2023b). SemEval-2023 Task 12: Sentiment analysis for African languages (AfriSenti-SemEval). In *Proceedings of SemEval-2023*, 2319-2337.
 
-Muhammad, S. H., Abdulmumin, I., Ayele, A. A., Adelani, D. I., et al. (2025). AfriHate: A multilingual collection of hate speech and abusive language datasets for African languages. In *Proceedings of NAACL 2025*, 1854–1871.
+Muhammad, S. H., Abdulmumin, I., Ayele, A. A., Adelani, D. I., et al. (2025). AfriHate: A multilingual collection of hate speech and abusive language datasets for African languages. In *Proceedings of NAACL 2025*, 1854-1871.
 
 NLLB Team, Costa-jussà, M. R., Cross, J., Çelebi, O., Elbayad, M., et al. (2022). No language left behind: Scaling human-centered machine translation. arXiv:2207.04672.

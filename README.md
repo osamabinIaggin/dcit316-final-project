@@ -10,11 +10,11 @@ Manuscript: `FINAL_PROJECT_22128981_GideonElormGlago.pdf` · Slides:
 
 ## Research questions
 
-1. **Accountability.** What do public resources that claim Twi coverage disclose about the language
+1. Accountability: what do public resources that claim Twi coverage disclose about the language
    variety, where the text came from, the annotators and their agreement?
-2. **Distribution.** How far is the text those claims are measured on from Twi as written on social
+2. Distribution: how far is the text those claims are measured on from Twi as written on social
    media?
-3. **Capability.** How do the tools a Ghanaian analyst would reach for perform on natively written
+3. Capability: how do the tools a Ghanaian analyst would reach for perform on natively written
    Twi tweets, against a baseline trained on Twi?
 
 ## Reproducing everything
@@ -43,7 +43,7 @@ cached in `reports/predictions/` and `data/derived/`; delete them to recompute.
 
 ## Data access
 
-All data is public and needs no account or key. Raw corpora are **not committed**:
+All data is public and needs no account or key. Raw corpora are not committed:
 `scripts/fetch_data.py` downloads AfriSenti Twi and MasakhaNER 2.0 Twi from pinned GitHub commits and
 FLORES-200 from Meta's release, and writes a checksum manifest to `data/raw/MANIFEST.md`. The
 AfriSenti and MasakhaNER repositories declare no licence, so the text is fetched from source rather

@@ -91,8 +91,8 @@ def main() -> int:
         "Google Translate added Twi and Ewe in 2022.",
         "Meta's NLLB-200 covers both. Its benchmark, FLORES-200, lists twi_Latn, aka_Latn and ewe_Latn.",
         "AfriSenti, AfriHate and MasakhaNER 2.0 all list Twi.",
-        "A student in Accra would reasonably conclude the tooling problem is solved. "
-        "This project checks what those claims deliver on Twi as people write it online."], 20)
+        "From Accra, it looks as if the tools exist. This project checks what they do with Twi as people "
+        "write it online."], 20)
 
     s = titled(prs, "Three research questions", "Scope")
     text(s, 0.6, 1.8, 12, 4.8, [
@@ -166,7 +166,7 @@ def main() -> int:
         f"Gold neutral rate: {gold_neutral:.1%}",
         f'English-only predicts neutral {r["english_only"]["predicted_neutral_rate"]:.1%} of the time',
         f'and calls {r["english_only"]["silent_failure_rate"]:.1%} of positive or negative tweets neutral.',
-        "Nothing in its output signals a problem."], 17)
+        "Its output carries no warning that anything went wrong."], 17)
 
     s = titled(prs, "Where the systems break", "Error analysis")
     s.shapes.add_picture(str(F / "fig5_slices.png"), Inches(0.4), Inches(1.5), width=Inches(7.6))
@@ -178,7 +178,7 @@ def main() -> int:
         f'{nl["n"] - nl["identical_translations"]} of {nl["n"]} tweets and the final label of '
         f'{errs["nllb_twi_vs_aka_label_disagreements"]}.',
         "Without emoji, the English model calls "
-        f'{float(slices["emoji/no emoji"]["english_only_pred_neutral"]):.0%} of tweets neutral: it reads the emoji, not the Twi.',
+        f'{float(slices["emoji/no emoji"]["english_only_pred_neutral"]):.0%} of tweets neutral, so its other calls come mostly from emoji.',
         f'{errs["all_three_nonmajority_systems_wrong"]} tweets defeat the baseline, XLM-T and NLLB alike.'], 14)
 
     s = titled(prs, "Limitations", "Responsible claims")
