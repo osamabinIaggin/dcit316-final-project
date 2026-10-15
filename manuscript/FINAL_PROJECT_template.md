@@ -114,9 +114,9 @@ Twi tweets collected around Ghana; it cannot confirm that any individual author 
 Collecting through sentiment lexicons may also favour emotional tweets, which would be one
 explanation for the small neutral class (15%); I have not tested that.
 
-I did not create an independently labelled test sample. Labelling Twi sentiment needs a reader of
-Twi, and I could not do it reliably myself; a sample labelled by someone who cannot read the
-language would add noise, not a check. Every capability result therefore rests on AfriSenti's own
+I did not create an independently labelled test sample. I speak and read Twi, but I am not a trained
+annotator, and a sample labelled by me alone would set one untrained rater against AfriSenti's three
+native-speaker annotators, whose own agreement is κ = 0.51. Every capability result therefore rests on AfriSenti's own
 labels, and Section 8 treats that as a limitation.
 
 Everything is public. `scripts/fetch_data.py` downloads each file from a pinned commit and records a
@@ -126,8 +126,9 @@ tweets carry no user handles or links (none of the 4,818 tweets contains one). N
 collected and no person was contacted. The few tweets quoted in Section 7 are already distributed in
 a public benchmark and identify nobody.
 
-I do not read Twi well enough to judge translation quality, so no result depends on my reading of
-Twi. Where a native speaker's judgement is needed, the paper says so. The full data card, ethics
+I speak Twi but I am not a trained translator, so I did not grade NLLB's translations, and no result
+depends on my own reading of Twi text. Where a translation judgement would be needed, the paper says
+so. The full data card, ethics
 statement and AI-use disclosure are in the repository.
 
 ## 4. Methods
@@ -403,7 +404,7 @@ spelling variants that defeat translation. Its weak point is the neutral class (
 #### Tweets every system gets wrong
 
 {{errors.all_three_nonmajority_systems_wrong}} tweets are misclassified by the
-baseline, XLM-T and the NLLB pipeline alike. Samples are saved in `reports/error_analysis/`. I cannot read them well enough to say whether the systems or the gold labels are wrong. The
+baseline, XLM-T and the NLLB pipeline alike. Samples are saved in `reports/error_analysis/`. I did not relabel them, so the paper does not say whether the systems or the gold labels are wrong. The
 creators' note that many Twi tweets are ambiguous makes label error a plausible explanation for some
 of them, but I have not verified a single annotation error, and the paper makes no claim that any
 specific label is wrong.
@@ -484,18 +485,18 @@ them, Google Translate, could not be tested here at all.
 
 ## 8. Limitations
 
--  "Not found" in Table 2 means the fact is missing from the
+- "Not found" in Table 2 means the fact is missing from the
   public paper. The practice may have happened.
 - No independently labelled sample. Every capability result depends on AfriSenti's labels (κ = 0.51 for Twi, with
   ambiguity noted by the authors). Some of what looks like system error is probably label noise.
--  I do not read Twi well enough to evaluate translations, so the
-  NLLB results show that sentiment was lost, not that a translation was wrong.
--  Sentiment on one Twitter corpus. Hate speech (AfriHate Twi) and other
+- I did not grade NLLB's translations, so the NLLB results show that sentiment was lost, not that a
+  translation was wrong.
+- Sentiment on one Twitter corpus. Hate speech (AfriHate Twi) and other
   tasks could behave differently.
--  XLM-T was not trained on any African language; an Africa-centric model
+- XLM-T was not trained on any African language; an Africa-centric model
   fine-tuned for sentiment might do much better. Google Translate was not tested because I had no
   API key. Language identifiers (AfroLID, GlotLID) were not run.
--  The English-token estimate and the orthography slices are
+- The English-token estimate and the orthography slices are
   heuristics, tested in `tests/`, but not validated against human judgement.
 - AfriSenti releases no per-tweet location, and its lexicon-based collection may over-sample
   emotional tweets. Both limit how far the results generalise to Ghanaian Twitter as a whole.
@@ -518,12 +519,7 @@ agreement reported in comparable form. Until those exist, anyone analysing Twi o
 tweets, and on this evidence a small in-domain model is a stronger starting point than the
 off-the-shelf systems tested.
 
-## AI-use statement
 
-I used Claude (Anthropic) through Claude Code to brainstorm the topic, write code and draft text.
-Every quotation was located by script in the source PDFs, every reference was checked against the
-publisher's record, and every number is written into this manuscript by
-`scripts/fill_manuscript.py` from files the code produced. Details are in `ai_use_disclosure.md`.
 
 ## References
 

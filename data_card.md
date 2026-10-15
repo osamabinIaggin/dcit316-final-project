@@ -1,57 +1,79 @@
-# Data card
+# Data Card - DCIT 316 Final Course Project
 
-Gideon Elorm Glago (22128981). Covers every dataset this project reads. None of the data is
-committed to the repository; `scripts/fetch_data.py` downloads it, pinned to a commit, and
-`data/raw/MANIFEST.md` records the checksum of each file.
+Compiled by: Gideon Elorm Glago (22128981)
+Covers: AfriSenti Twi (all splits), MasakhaNER 2.0 Twi (sentences only), FLORES-200 `twi_Latn`,
+`aka_Latn`, `ewe_Latn` and `eng_Latn`, and the four papers audited in Section 5.2.
 
-## AfriSenti, Twi subset
+---
 
-| | |
-|---|---|
-| What it is | Tweets labelled positive, neutral or negative by native Twi speakers |
-| Source | `afrisenti-semeval/afrisent-semeval-2023` on GitHub, commit `5aec3cf` |
-| Size | 3,481 train, 388 dev, 949 test (4,818 tweets) |
-| Test labels | positive 450, negative 353, neutral 146 |
-| Agreement | Free-marginal multi-rater kappa 0.51 for Twi (AfriSenti paper, Table 5) |
-| Language assignment | 2,000 tweets labelled as Twi by native speakers; the rest assigned by a model trained on those 2,000 |
-| Licence | The data README asks users to cite the SemEval-2023 and AfriSenti papers. The repository declares no licence file, so I treat the data as research-use only and do not redistribute it |
-| Personal data | Tweets are public posts. Handles and URLs appear to be stripped in the release (0 matches for `@` handles or URLs across 4,818 tweets) |
+## 1. In one line
 
-The paper reports the Twi splits as 3,482 / 389 / 950. Those are the line counts of the released
-files including the header row, so the two sources agree once the header is excluded.
+The only human-labelled sentiment data for a Ghanaian language, compared against the two Twi
+benchmarks that capability claims rest on, both of which are translations into Twi.
 
-## MasakhaNER 2.0, Twi subset
+## 2. Provenance
 
-| | |
-|---|---|
-| What it is | Named-entity annotations on Twi news text |
-| Source | `masakhane-io/masakhane-ner`, commit `ba5843c`, all three splits |
-| Use here | Surface statistics only (6,056 sentences). Entity labels are not used |
-| Provenance | Twi text comes from MAFAND-MT, French and English news translated into Twi |
-| Licence | No licence file in the repository; research use, not redistributed |
+| | AfriSenti Twi | MasakhaNER 2.0 Twi | FLORES-200 |
+|---|---|---|---|
+| Source | `afrisenti-semeval/afrisent-semeval-2023`, commit `5aec3cf` | `masakhane-io/masakhane-ner`, commit `ba5843c` | `dl.fbaipublicfiles.com/nllb/flores200_dataset.tar.gz` |
+| Text | Tweets | News sentences | Wikimedia sentences |
+| Natively written | Yes | No: MAFAND-MT, French and English news translated into Twi | No: translated from English |
+| Collection | Twitter Academic API, location heuristics around Ghana plus stopword lists and sentiment lexicons | Translation | Professional translation, human-verified |
+| Labels used here | Sentiment (positive, neutral, negative) by native speakers | None; text only | None; text only |
+| Size used | 3,481 train, 388 dev, 949 test | 6,056 sentences | 2,009 sentences per file |
+| Licence | No licence file; the README asks users to cite the SemEval-2023 and AfriSenti papers | No licence file | As released by Meta |
 
-## FLORES-200
+Every file is fetched by `scripts/fetch_data.py` and checksummed in `data/raw/MANIFEST.md`.
 
-| | |
-|---|---|
-| What it is | 2,009 English Wikimedia sentences (dev + devtest) translated into each language |
-| Source | `dl.fbaipublicfiles.com/nllb/flores200_dataset.tar.gz` |
-| Files read | `twi_Latn`, `aka_Latn`, `ewe_Latn`, `eng_Latn` |
-| Use here | Surface statistics, vocabulary overlap, and the English lexicon used to estimate English-token share |
-| Note | `aka_Latn` and `twi_Latn` are independent translations: 8 of 2,009 lines are identical and their vocabulary Jaccard similarity is 0.358 |
+## 3. Composition
 
-## Audited papers
+AfriSenti Twi test split: positive 450, negative 353, neutral 146. Only 15.4% is neutral, which
+shapes every metric in the paper: a system that defaults to "neutral" is wrong almost everywhere.
 
-Four PDFs (AfriSenti, MasakhaNER 2.0, AfriHate, the FLORES correction paper) are downloaded by
-`scripts/fetch_sources.py`. Only short matched lines are committed, under `reports/evidence/`.
+Surface profile (`reports/metrics/ladder_profile.csv`):
 
-## Safe access
+| Corpus | Mean tokens | Tokens with ɛ/ɔ | Texts writing `3` for ɛ | Texts with emoji |
+|---|---|---|---|---|
+| FLORES-200 `twi_Latn` | 25.3 | 28.5% | 0.05% | 0% |
+| FLORES-200 `aka_Latn` | 25.8 | 26.1% | 0.10% | 0% |
+| MasakhaNER 2.0 Twi | 23.4 | 34.6% | 0.03% | 0% |
+| AfriSenti Twi | 9.3 | 5.6% | 42.5% | 41.2% |
 
-Committed derived files: per-system predictions keyed by test-row number
-(`reports/predictions/all_systems_test_ids.csv`), the NLLB English translations, and samples of at
-most 25 tweets per error type in `reports/error_analysis/`. The full tweet text stays out of the
-repository.
+## 4. Known quality problems
 
-Everything above is public and needs no account, key or approval. No private data, credentials or
-scraped content is used. The models (Twitter-RoBERTa, XLM-T, NLLB-200 distilled 600M) are public on
-Hugging Face and download on first run.
+These are findings, each reproduced by a committed script.
+
+### 4.1 AfriSenti's Twi labels are noisy, by its authors' own account
+
+Inter-annotator agreement for Twi is κ = 0.51 (free-marginal), and the paper says "a significant
+portion of tweets in Twi were ambiguous". The neutral class is small and probably the noisiest.
+
+### 4.2 Language membership is mostly model-assigned
+
+Native speakers labelled 2,000 tweets as Twi or not; a model trained on those assigned the rest.
+
+### 4.3 No tweet can be tied to a place
+
+The release has no per-tweet location. The corpus supports claims about Twi tweets collected around
+Ghana, not about verified Ghanaian authors.
+
+### 4.4 Collection may over-sample emotional tweets
+
+Collection used sentiment lexicons, which could explain the small neutral class. Untested.
+
+### 4.5 FLORES's two Twi files are unlabelled for dialect
+
+`aka_Latn` and `twi_Latn` are independent translations (8 of 2,009 lines identical, vocabulary
+Jaccard 0.358). Neither file says which variety it is, and switching between them as NLLB's source
+code changes the sentiment label for 25.6% of test tweets.
+
+### 4.6 A split-size mismatch is a header row, not an error
+
+The paper's 3,482 / 389 / 950 are the files' line counts including the header.
+
+## 5. Safe access and restrictions
+
+All data is public and needs no account or key. Raw text is not committed, because the AfriSenti
+and MasakhaNER repositories declare no licence. Committed derived files are the per-system
+predictions keyed by row number, NLLB's English translations, and samples of at most 25 tweets per
+error type.

@@ -186,7 +186,7 @@ def main() -> int:
     s = titled(prs, "Limitations", "Responsible claims")
     text(s, 0.6, 1.7, 12, 5, [
         "\"Not reported\" means not verifiable from the public record, not that the practice was absent.",
-        "I do not read Twi well enough to judge translations, so translation results are about sentiment "
+        "I speak Twi but did not grade translations, so translation results are about sentiment "
         "lost, not translation errors.",
         "One labelled Twi social corpus exists, with kappa 0.51. Every result inherits its label noise.",
         "Google Translate was not tested (no API key). Ewe and Ga could not be evaluated: no data."], 17)
