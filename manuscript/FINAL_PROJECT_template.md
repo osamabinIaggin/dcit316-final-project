@@ -24,11 +24,7 @@ reaches macro-F1 {{results.tfidf_logreg.macro_f1|.3f}}. An English Twitter model
 {{results.english_only.macro_f1|.3f}}, XLM-T {{results.xlmt.macro_f1|.3f}}, and NLLB translation
 followed by English classification {{results.nllb_twi.macro_f1|.3f}} (all p < 0.001 against the
 baseline). The off-the-shelf systems fail by predicting neutral: the English model labels
-{{results.english_only.silent_failure_rate|%}} of positive and negative tweets as neutral. NLLB
-passes `3`-spellings through untranslated in {{derived.copy_through_rate|%}} of affected tweets, and
-declaring the source as `aka_Latn` instead of `twi_Latn` changes the final label for
-{{derived.labels_changed_by_code_rate|%}} of tweets. For Ghanaian social media, a little in-domain
-labelled data beats every system that claims broader coverage.
+{{results.english_only.silent_failure_rate|%}} of positive and negative tweets as neutral. Removing emoji confirms that the English model's few non-neutral calls depend on them: without emoji, {{robust.R1_emoji_ablation.english_only.of_which_become_neutral}} of its {{robust.R1_emoji_ablation.english_only.nonneutral_predictions_with_emoji}} non-neutral predictions on emoji-bearing tweets become neutral. Rewriting `3` as ɛ stops NLLB copying those spellings into its output, but does not significantly improve the translation pipeline (p = {{robust.R2_spelling_fix.nllb_twi.mcnemar_before_vs_after.p_value|.2f}}); it does improve XLM-T (p = {{robust.R2_spelling_fix.xlmt.mcnemar_before_vs_after.p_value|.3f}}). Declaring the source as `aka_Latn` instead of `twi_Latn` changes the final label for {{derived.labels_changed_by_code_rate|%}} of tweets. On this test set, every off-the-shelf system tested falls well short of a simple model trained on 3,481 Twi tweets.
 
 ## 1. Introduction
 
@@ -111,6 +107,18 @@ The AfriSenti Twi test split holds {{notes.test_label_distribution.positive}} po
 {{notes.test_label_distribution.negative}} negative and {{notes.test_label_distribution.neutral}}
 neutral tweets. Its reported inter-annotator agreement is 0.51 (free-marginal kappa).
 
+AfriSenti collected its Twi tweets through the Twitter Academic API with location-based heuristics
+for the countries where each language is spoken (Ghana for Twi), combined with stopword lists and
+sentiment lexicons. The release carries no per-tweet location, so the corpus supports claims about
+Twi tweets collected around Ghana; it cannot confirm that any individual author is Ghanaian.
+Collecting through sentiment lexicons may also favour emotional tweets, which would be one
+explanation for the small neutral class (15%); I have not tested that.
+
+I did not create an independently labelled test sample. Labelling Twi sentiment needs a reader of
+Twi, and I could not do it reliably myself; a sample labelled by someone who cannot read the
+language would add noise, not a check. Every capability result therefore rests on AfriSenti's own
+labels, and Section 8 treats that as a limitation.
+
 Everything is public. `scripts/fetch_data.py` downloads each file from a pinned commit and records a
 SHA-256 checksum, so no raw data is committed; the AfriSenti and MasakhaNER repositories declare no
 licence, and I did not want to redistribute text I had no explicit permission to share. AfriSenti
@@ -168,6 +176,10 @@ All systems are scored on the 949-tweet AfriSenti Twi test split, which is used 
 | XLM-T | `cardiffnlp/twitter-xlm-roberta-base-sentiment`, zero-shot | Multilingual, no Twi training |
 | NLLB → English | `nllb-200-distilled-600M` translates Twi to English, then the English-only model | Translate-then-classify |
 
+The baseline's word features use scikit-learn's default token pattern, which keeps only runs of two
+or more word characters and so discards emoji and punctuation. The character n-grams keep them.
+Section 4.4 tests whether keeping emoji in the word features matters.
+
 The NLLB pipeline is run twice on identical input, once declaring the source as `twi_Latn` and once
 as `aka_Latn`, because FLORES treats these as separate languages and no resource says which one
 tweets belong to. Decoding is greedy with at most 96 new tokens.
@@ -183,6 +195,21 @@ For the error analysis, the test split is cut by orthography (uses ɛ/ɔ, writes
 English-token share, by length and by the presence of emoji, and macro-F1 is computed per slice.
 Samples of three error types are saved for inspection: sentiment lost through translation, tweets
 every non-trivial system gets wrong, and label changes caused only by the declared source language.
+
+### 4.4 Robustness checks
+
+The error analysis proposes causes, and correlation within a slice does not establish them, so
+`scripts/run_robustness.py` tests each one by intervention.
+
+- R1, emoji ablation: remove every emoji from the test tweets and rerun the English-only model and
+  XLM-T. If their non-neutral predictions depend on emoji, they should turn neutral; predictions on
+  tweets that had no emoji should not change at all.
+- R2, spelling fix: in the {{robust.R2_spelling_fix.n_tweets_with_3_for_e}} tweets that write `3`
+  inside a word, replace it with ɛ (`s3` becomes `sɛ`, `y3di` becomes `yɛdi`), then rerun NLLB with the
+  English model, and XLM-T. This is a heuristic rewrite; I cannot check each result by reading it.
+- R3: an exact McNemar test between the `twi_Latn` and `aka_Latn` runs.
+- R4: retrain the baseline with character features only, word features only, both, and both with a
+  word token pattern that keeps emoji. C is chosen on dev each time.
 
 ## 5. Results
 
@@ -337,8 +364,8 @@ output would show it.
 On tweets without emoji it predicts neutral for
 {{slices.emoji/no emoji.english_only_pred_neutral|%}} of them and scores
 {{slices.emoji/no emoji.english_only_macro_f1|.3f}}; with emoji it scores
-{{slices.emoji/has emoji.english_only_macro_f1|.3f}}, so most of its non-neutral predictions appear to
-come from the emoji. Its errors fall slightly as the English share
+{{slices.emoji/has emoji.english_only_macro_f1|.3f}}. That pattern suggested the model was relying on
+emoji; Section 6.1 confirms it by removing them. Its errors fall slightly as the English share
 rises ({{slices.english_mix/>25%.english_only_macro_f1|.3f}} above 25%, from
 {{slices.english_mix/none.english_only_macro_f1|.3f}} with none), but that slice holds only
 {{slices.english_mix/>25%.n}} tweets.
@@ -349,9 +376,9 @@ Of the
 {{errors.copy_through.tweets_with_3_for_e}} test tweets that write `3` for ɛ,
 {{errors.copy_through.translations_still_containing_3_spellings}} ({{derived.copy_through_rate|%}})
 come back from NLLB with those words still in them: `s3`, `de3`, `y3di` reach the English classifier
-as unknown strings. Those tweets are then called neutral
-{{errors.copy_through.nllb_twi_pred_neutral_when_copied|%}} of the time, against
-{{errors.copy_through.nllb_twi_pred_neutral_when_not_copied|%}} when the spelling was absorbed.
+as unknown strings. Those tweets are then called neutral {{errors.copy_through.nllb_twi_pred_neutral_when_copied|%}} of
+the time, against {{errors.copy_through.nllb_twi_pred_neutral_when_not_copied|%}} when the spelling
+was absorbed. This is a correlation; Section 6.1 tests whether fixing the spelling helps.
 Standard orthography does not rescue translation either: on tweets that use ɛ/ɔ the NLLB pipeline
 scores {{slices.orthography/uses ɛ/ɔ.nllb_twi_macro_f1|.3f}}.
 
@@ -361,7 +388,10 @@ Translating the same tweets as `twi_Latn` and as
 `aka_Latn` gives identical output for only {{notes.nllb_source_code.identical_translations}} of
 {{notes.nllb_source_code.n}}. The final sentiment label differs for
 {{errors.nllb_twi_vs_aka_label_disagreements}} tweets ({{derived.labels_changed_by_code_rate|%}}),
-though the two settings score almost the same overall. An analyst who picks the other code gets a different label for one tweet in four, and nothing in
+while overall macro-F1 is {{robust.R3_twi_vs_aka.macro_f1_twi|.3f}} and
+{{robust.R3_twi_vs_aka.macro_f1_aka|.3f}}. An exact McNemar test finds no evidence that either code is
+more accurate (p = {{robust.R3_twi_vs_aka.mcnemar.p_value|.2f}}); with 949 tweets that does not show
+the two are equivalent, and the choice clearly changes which tweets are labelled correctly. An analyst who picks the other code gets a different label for one tweet in four, and nothing in
 the documentation reviewed in Section 5.2 says which code is right.
 
 #### The baseline
@@ -373,21 +403,73 @@ spelling variants that defeat translation. Its weak point is the neutral class (
 #### Tweets every system gets wrong
 
 {{errors.all_three_nonmajority_systems_wrong}} tweets are misclassified by the
-baseline, XLM-T and the NLLB pipeline alike. Samples are saved in `reports/error_analysis/`. I cannot
-read them well enough to say whether the systems or the gold labels are wrong, and with the
-creators' own note that many Twi tweets are ambiguous, some of these are likely label errors.
+baseline, XLM-T and the NLLB pipeline alike. Samples are saved in `reports/error_analysis/`. I cannot read them well enough to say whether the systems or the gold labels are wrong. The
+creators' note that many Twi tweets are ambiguous makes label error a plausible explanation for some
+of them, but I have not verified a single annotation error, and the paper makes no claim that any
+specific label is wrong.
+
+### 6.1 Testing the proposed causes
+
+| Check | Before | After | McNemar p |
+|---|---|---|---|
+| R1 English-only, tweets with emoji (n = {{robust.R1_emoji_ablation.n_with_emoji}}): macro-F1 | {{robust.R1_emoji_ablation.english_only.macro_f1_with_emoji|.3f}} | {{robust.R1_emoji_ablation.english_only.macro_f1_emoji_removed|.3f}} | {{robust.R1_emoji_ablation.english_only.mcnemar_before_vs_after.p_value|p}} |
+| R1 English-only: predicted neutral | {{robust.R1_emoji_ablation.english_only.pred_neutral_with_emoji|%}} | {{robust.R1_emoji_ablation.english_only.pred_neutral_emoji_removed|%}} | |
+| R1 XLM-T, tweets with emoji: macro-F1 | {{robust.R1_emoji_ablation.xlmt.macro_f1_with_emoji|.3f}} | {{robust.R1_emoji_ablation.xlmt.macro_f1_emoji_removed|.3f}} | {{robust.R1_emoji_ablation.xlmt.mcnemar_before_vs_after.p_value|p}} |
+| R2 NLLB pipeline, tweets with `3` (n = {{robust.R2_spelling_fix.n_tweets_with_3_for_e}}): macro-F1 | {{robust.R2_spelling_fix.nllb_twi.macro_f1_before|.3f}} | {{robust.R2_spelling_fix.nllb_twi.macro_f1_after|.3f}} | {{robust.R2_spelling_fix.nllb_twi.mcnemar_before_vs_after.p_value|.2f}} |
+| R2 NLLB pipeline: translations still containing `3` spellings | {{robust.R2_spelling_fix.nllb_twi.translations_with_3_spellings_before}} | {{robust.R2_spelling_fix.nllb_twi.translations_with_3_spellings_after}} | |
+| R2 NLLB pipeline: predicted neutral | {{robust.R2_spelling_fix.nllb_twi.pred_neutral_before|%}} | {{robust.R2_spelling_fix.nllb_twi.pred_neutral_after|%}} | |
+| R2 XLM-T, tweets with `3`: macro-F1 | {{robust.R2_spelling_fix.xlmt.macro_f1_before|.3f}} | {{robust.R2_spelling_fix.xlmt.macro_f1_after|.3f}} | {{robust.R2_spelling_fix.xlmt.mcnemar_before_vs_after.p_value|.3f}} |
+
+*Table 6. Interventions (`reports/metrics/robustness.json`).*
+
+Removing emoji confirms the emoji explanation. Of the English model's
+{{robust.R1_emoji_ablation.english_only.nonneutral_predictions_with_emoji}} non-neutral predictions on
+emoji-bearing tweets, {{robust.R1_emoji_ablation.english_only.of_which_become_neutral}} become neutral,
+and its predictions on the {{robust.R1_emoji_ablation.english_only.n_emoji_free}} emoji-free tweets do
+not change ({{robust.R1_emoji_ablation.english_only.unchanged_on_emoji_free_tweets}} of
+{{robust.R1_emoji_ablation.english_only.n_emoji_free}}), which rules out run-to-run variation as the
+source of the drop. XLM-T leans on emoji as well:
+{{robust.R1_emoji_ablation.xlmt.of_which_become_neutral}} of its
+{{robust.R1_emoji_ablation.xlmt.nonneutral_predictions_with_emoji}} non-neutral calls disappear.
+
+The spelling fix gives a mixed result. It stops NLLB copying `3` spellings (from
+{{robust.R2_spelling_fix.nllb_twi.translations_with_3_spellings_before}} translations to
+{{robust.R2_spelling_fix.nllb_twi.translations_with_3_spellings_after}}) and lowers the neutral rate,
+yet the pipeline's macro-F1 barely moves and the McNemar test finds no significant change. The
+copied spellings are therefore not shown to cause the pipeline's errors; something else in the
+translation or the English classifier limits it. The same rewrite does help XLM-T, which reads Twi
+directly: macro-F1 rises from {{robust.R2_spelling_fix.xlmt.macro_f1_before|.3f}} to
+{{robust.R2_spelling_fix.xlmt.macro_f1_after|.3f}} (p = {{robust.R2_spelling_fix.xlmt.mcnemar_before_vs_after.p_value|.3f}}).
+For a multilingual model applied to Twi tweets, normalising `3` to ɛ is a cheap fix with measured
+benefit on this data; it still leaves XLM-T far below the baseline.
+
+| Baseline variant | C (dev) | Test macro-F1 [95% CI] |
+|---|---|---|
+| Character n-grams only | {{robust.R4.char_only.chosen_C}} | {{robust.R4.char_only.test_macro_f1|.3f}} [{{robust.R4.char_only.test_macro_f1_ci95.0|.3f}}, {{robust.R4.char_only.test_macro_f1_ci95.1|.3f}}] |
+| Word n-grams only | {{robust.R4.word_only.chosen_C}} | {{robust.R4.word_only.test_macro_f1|.3f}} [{{robust.R4.word_only.test_macro_f1_ci95.0|.3f}}, {{robust.R4.word_only.test_macro_f1_ci95.1|.3f}}] |
+| Both (reported baseline) | {{robust.R4.both.chosen_C}} | {{robust.R4.both.test_macro_f1|.3f}} [{{robust.R4.both.test_macro_f1_ci95.0|.3f}}, {{robust.R4.both.test_macro_f1_ci95.1|.3f}}] |
+| Both, word tokens keep emoji | {{robust.R4.keep_emoji.chosen_C}} | {{robust.R4.keep_emoji.test_macro_f1|.3f}} [{{robust.R4.keep_emoji.test_macro_f1_ci95.0|.3f}}, {{robust.R4.keep_emoji.test_macro_f1_ci95.1|.3f}}] |
+
+*Table 7. Baseline feature ablation.*
+
+The baseline's lead does not depend on its feature set. Each variant scores between
+{{robust.R4.word_only.test_macro_f1|.3f}} and {{robust.R4.both.test_macro_f1|.3f}}, the intervals
+overlap, and the weakest variant is still more than 0.19 above the best off-the-shelf system. Keeping
+emoji in the word features produced no measurable gain, probably because the character n-grams
+already contain them.
 
 ## 7. Discussion
 
 The resources that claim Twi measure their claims on
 translated, standard-orthography prose (RQ1, RQ2), while Twi online is short, mixed with English and
-emoji, and spelled with digits in place of letters (RQ2). On that text, every system built for
-broad coverage loses to a small model trained on 3,481 tweets, and loses by turning sentiment into
-neutral (RQ3).
+emoji, and spelled with digits in place of letters (RQ2). On that text, each of the four off-the-shelf configurations tested scores far below a small model
+trained on 3,481 tweets, mostly by turning sentiment into neutral (RQ3). That is a result for these
+systems on this test set. It does not show that no multilingual model could do better; an
+Africa-centric model fine-tuned on AfriSenti was not tested.
 
-For anyone mining Ghanaian social media, off-the-shelf multilingual and translation-based pipelines
-are the wrong default for Twi. Even
-a modest amount of in-domain labelled data, with a linear model, does better. The pressing work is
+For anyone mining Ghanaian social media, the evidence here argues against using these off-the-shelf
+pipelines on Twi without first checking them on labelled Twi tweets. On this data a modest amount of
+in-domain labelled data, with a linear model, did better than all of them. The pressing work is
 collecting and labelling more natively written text, for Twi and especially for Ga and Ewe, where
 none exists.
 
@@ -404,7 +486,7 @@ them, Google Translate, could not be tested here at all.
 
 -  "Not found" in Table 2 means the fact is missing from the
   public paper. The practice may have happened.
--  Every capability result depends on AfriSenti's labels (κ = 0.51 for Twi, with
+- No independently labelled sample. Every capability result depends on AfriSenti's labels (κ = 0.51 for Twi, with
   ambiguity noted by the authors). Some of what looks like system error is probably label noise.
 -  I do not read Twi well enough to evaluate translations, so the
   NLLB results show that sentiment was lost, not that a translation was wrong.
@@ -415,7 +497,10 @@ them, Google Translate, could not be tested here at all.
   API key. Language identifiers (AfroLID, GlotLID) were not run.
 -  The English-token estimate and the orthography slices are
   heuristics, tested in `tests/`, but not validated against human judgement.
--  Ga's absence was checked against FLORES-200's file list; Dagbani was not checked
+- AfriSenti releases no per-tweet location, and its lexicon-based collection may over-sample
+  emotional tweets. Both limit how far the results generalise to Ghanaian Twitter as a whole.
+- The spelling fix in R2 is a heuristic rewrite that I could not check by reading the output.
+- Ga's absence was checked against FLORES-200's file list; Dagbani was not checked
   everywhere. GhanaNLP corpora and the Khaya translator were not audited.
 
 ## 9. Conclusion
@@ -423,13 +508,15 @@ them, Google Translate, could not be tested here at all.
 Twi is listed as supported by the largest translation systems and by three human-annotated
 benchmarks. The benchmarks those claims rest on are translations into Twi, written in a spelling
 that most Twi tweets do not use, under two language codes that nobody distinguishes, and the
-agreement scores attached to them cannot be compared. On 949 natively written Twi tweets, an
-English-only model, a multilingual model and a translate-then-classify pipeline all lose to a
-TF-IDF baseline trained on Twi, mostly by calling emotional tweets neutral.
+agreement scores attached to them cannot be compared. On 949 natively written Twi tweets, an English-only model, a multilingual model and a
+translate-then-classify pipeline all scored well below a TF-IDF baseline trained on Twi, mostly by
+calling emotional tweets neutral. For the English model, removing emoji showed that its few
+non-neutral calls came from the emoji.
 
 What is missing is data written the way Ghanaians write, a convention for naming the variety, and
-agreement reported in comparable form. Until those exist, the safest way to analyse Twi on social
-media is to label some of it and train on it.
+agreement reported in comparable form. Until those exist, anyone analysing Twi on social media should check their tools on labelled Twi
+tweets, and on this evidence a small in-domain model is a stronger starting point than the
+off-the-shelf systems tested.
 
 ## AI-use statement
 

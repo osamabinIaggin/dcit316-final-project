@@ -35,7 +35,13 @@ def context() -> dict:
                               / c["tweets_with_3_for_e"])(
             json.loads((ROOT / "reports/error_analysis/summary.json").read_text())["copy_through"]),
     }
+    robust = json.loads((M / "robustness.json").read_text())
+    r4 = robust["R4_feature_ablation"]
+    robust["R4"] = {"char_only": r4["char_only"], "word_only": r4["word_only"],
+                    "both": r4["char_plus_word (reported baseline)"],
+                    "keep_emoji": r4["char_plus_word_keeping_emoji"]}
     return {
+        "robust": robust,
         "derived": derived,
         "results": res["results"],
         "notes": res["notes"],
